@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.mongodb.core.mapping.Document;
 import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
 @Document("prodotti")
