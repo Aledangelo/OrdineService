@@ -54,7 +54,7 @@ public class ordiniController {
     @GetMapping("/get/{id}")
     public Ordine getOrdine(@PathVariable("id") String id) { return gestioneOrdini.getOrdine(id); }
 
-    @RolesAllowed("Admin")
+    @RolesAllowed({"admin_role", "rider_role"})
     @GetMapping("/all")
     public List<Ordine> getAll() { return gestioneOrdini.getAll(); }
 

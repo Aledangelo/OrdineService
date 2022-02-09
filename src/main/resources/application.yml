@@ -3,7 +3,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://192.168.1.32:8080/auth/realms/progettoSSD/protocol/openid-connect/certs
+          jwk-set-uri: http://localhost:1234/auth/realms/progettoSSD/protocol/openid-connect/certs
 
 server:
   port: 9001
