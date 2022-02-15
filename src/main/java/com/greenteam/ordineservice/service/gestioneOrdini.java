@@ -6,7 +6,6 @@ import com.greenteam.ordineservice.entity.statoOrdine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.greenteam.ordineservice.repository.ordineRepository;
-import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +14,6 @@ public class gestioneOrdini {
 
     @Autowired
     private ordineRepository ordineRepository;
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     public <Any> Any addToOrder(List<Prodotto> prodotti) {
         float tot = 0;
