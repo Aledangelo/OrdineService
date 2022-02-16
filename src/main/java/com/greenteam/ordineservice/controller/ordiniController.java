@@ -5,6 +5,10 @@ import com.greenteam.ordineservice.entity.Prodotto;
 import com.greenteam.ordineservice.entity.statoOrdine;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.Banner;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.greenteam.ordineservice.service.gestioneOrdini;
 import com.greenteam.ordineservice.service.gestioneRider;
@@ -12,11 +16,13 @@ import com.greenteam.ordineservice.service.gestioneRider;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 @Slf4j
-@RestController
+@Controller
 @RequestMapping("/ordini")
 public class ordiniController {
 
@@ -37,23 +43,26 @@ public class ordiniController {
 
     @RolesAllowed("admin_role")
     @GetMapping("/drop/{id}")
-    public String deleteOrdine(@PathVariable("id") String id, HttpServletRequest request) {
+    public String deleteOrdine(@PathVariable("id") String id, HttpServletRequest request, Model model) {
         logging(request);
-        return gestioneOrdini.removeOrdine(id);
+        gestioneOrdini.removeOrdine(id);
+        return getAll(request, model);
     }
 
     @RolesAllowed("rider_role")
-    @GetMapping("/accept/{id_rider}/{id_ordine}")
-    public String accettaOrdine(@PathVariable("id_rider") String id_rider, @PathVariable("id_ordine") String id_ordine, HttpServletRequest request) {
+    @GetMapping("/accept/{id_ordine}")
+    public String accettaOrdine(@PathVariable("id_ordine") String id_ordine, HttpServletRequest request) {
         logging(request);
-        return gestioneRider.accettaOrdine(id_rider, id_ordine);
+        gestioneRider.accettaOrdine(request.getRemoteUser(), id_ordine);
+        return "ordineOk";
     }
 
     @RolesAllowed("rider_role")
-    @GetMapping("/complete/{id_rider}")
-    public String chiudiOrdine(@PathVariable("id_rider") String id_rider, HttpServletRequest request) {
+    @GetMapping("/complete/{id_ordine}")
+    public String chiudiOrdine(@PathVariable("id_ordine") String id_ordine, HttpServletRequest request) {
         logging(request);
-        return gestioneRider.chiudiOrdine(id_rider);
+        gestioneRider.chiudiOrdine(id_ordine);
+        return "ordineOk";
     }
 
     @RolesAllowed("rider_role")
@@ -65,9 +74,10 @@ public class ordiniController {
 
     @RolesAllowed("admin_role")
     @GetMapping("/suspend/{id}")
-    public String sospendiOrdine(@PathVariable("id") String id, HttpServletRequest request) {
+    public String sospendiOrdine(@PathVariable("id") String id, HttpServletRequest request, Model model) {
         logging(request);
-        return gestioneRider.sospendiOrdine(id);
+        gestioneRider.sospendiOrdine(id);
+        return getAll(request, model);
     }
 
     @RolesAllowed({"admin_role", "rider_role"})
@@ -77,17 +87,42 @@ public class ordiniController {
         return gestioneOrdini.getOrdine(id);
     }
 
-    @RolesAllowed({"admin_role", "rider_role"})
-    @GetMapping("/all")
-    public List<Ordine> getAll(HttpServletRequest request) {
+    @RolesAllowed("rider_role")
+    @GetMapping("/waiting/all")
+    public String getWaiting(HttpServletRequest request, Model model) {
         logging(request);
-        return gestioneOrdini.getAll();
+        List<Ordine> ordini = gestioneOrdini.getWaiting();
+        model.addAttribute("listaOrdini", ordini);
+        model.addAttribute("ordine", new Ordine());
+        model.addAttribute("prodotto", new Prodotto());
+        return "ordiniWait";
+    }
+
+    @RolesAllowed({"admin_role"})
+    @GetMapping("/all")
+    public String getAll(HttpServletRequest request, Model model) {
+        logging(request);
+        List<Ordine> ordini = gestioneOrdini.getAll();
+        model.addAttribute("listaOrdini", ordini);
+        model.addAttribute("ordine", new Ordine());
+        model.addAttribute("prodotto", new Prodotto());
+        return "ordiniTOT";
     }
 
     @RolesAllowed({"user_role","admin_role"})
     @PostMapping("/createOrder")
-    public <Any> Any createOrder(@Valid @RequestBody LinkedList<Prodotto> l, HttpServletRequest request) {
+    public void createOrder(@Valid @RequestBody LinkedList<Prodotto> l, HttpServletRequest request) {
         logging(request);
-        return gestioneOrdini.addToOrder(l);
+        gestioneOrdini.addToOrder(l);
+        return;
+    }
+
+    @RolesAllowed("rider_role")
+    @GetMapping("/rider/myOrder")
+    public String myOrderRider(HttpServletRequest request, Model model) {
+        logging(request);
+        Ordine o = gestioneRider.myOrder(request.getRemoteUser());
+        model.addAttribute("ordine", o);
+        return "myOrdine";
     }
 }

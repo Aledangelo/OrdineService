@@ -19,6 +19,7 @@ public class Ordine {
     @Id
     private String id;
     private String nome_ristorante;
+    private String nome_rider;
     @NotNull
     private List<Prodotto> prodotti;
     @Positive
