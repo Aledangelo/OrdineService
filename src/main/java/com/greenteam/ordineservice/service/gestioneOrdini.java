@@ -4,6 +4,7 @@ import com.greenteam.ordineservice.entity.Ordine;
 import com.greenteam.ordineservice.entity.Prodotto;
 import com.greenteam.ordineservice.entity.statoOrdine;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.greenteam.ordineservice.repository.ordineRepository;
@@ -19,99 +20,83 @@ public class gestioneOrdini {
     @Autowired
     private ordineRepository ordineRepository;
 
-    public <Any> Any addToOrder(List<Prodotto> prodotti) {
+    public void addToOrder(List<Prodotto> prodotti, String id_utente, String address) throws Exception {
         float tot = 0;
 
         if (prodotti.size() <= 0) {
-            return (Any) "No products";
+            throw new Exception();
         }
 
-        try {
-            for (Prodotto p: prodotti) {
-                tot += p.getPrezzo();
-            }
-
-            if (tot <= 0) {
-                return (Any) "Operation not permitted";
-            }
-
-            Ordine ordine = new Ordine();
-            ordine.setNome_ristorante("Rostì");
-            ordine.setProdotti(prodotti);
-            ordine.setPrezzo_totale(tot);
-            return (Any) saveOrdine(ordine);
-        } catch (Exception e) {
-            return (Any) e.getMessage();
+        for (Prodotto p: prodotti) {
+            tot += p.getPrezzo();
         }
+
+        if (tot <= 0) {
+            throw new Exception();
+        }
+
+        Ordine ordine = new Ordine();
+        ordine.setNome_ristorante("Rostì");
+        ordine.setProdotti(prodotti);
+        ordine.setPrezzo_totale(tot);
+        ordine.setId_user(id_utente);
+        ordine.setIndirizzo(address);
+        saveOrdine(ordine);
     }
 
-    private Ordine saveOrdine(Ordine o) {
+    private Ordine saveOrdine(Ordine o) throws Exception {
         o.setStato(statoOrdine.IN_ATTESA);
         return ordineRepository.save(o);
     }
 
-    public String removeOrdine(String id) {
-        try {
+    public String removeOrdine(String id) throws Exception{
+        if (ObjectId.isValid(id)) {
             Optional<Ordine> o = ordineRepository.findById(id);
             if (o.isEmpty()) {
-                return "Operation not permitted";
+                throw new Exception();
             }
             Ordine ordine = o.get();
             String identifier = ordine.getId();
             ordineRepository.deleteById(identifier);
             return identifier;
-        } catch (Exception e) {
-            return e.getMessage();
-        }
+        } else throw new Exception();
     }
 
-    public void setRiderOrdine(String rider, String ordine) {
-        try {
+    public void setRiderOrdine(String rider, String ordine) throws Exception {
+        if (ObjectId.isValid(ordine)) {
             Optional<Ordine> o = ordineRepository.findById(ordine);
             if (o.isEmpty()) {
-                return;
+                throw new Exception();
             }
             Ordine ord = o.get();
             ord.setNome_rider(rider);
             ordineRepository.save(ord);
-            return;
-        } catch (Exception e) {
-            return;
-        }
+        } else throw new Exception();
     }
 
-    public String updateStato(String id, statoOrdine s) {
-        try {
+    public String updateStato(String id, statoOrdine s) throws Exception{
+        if (ObjectId.isValid(id)) {
             Optional<Ordine> o = ordineRepository.findById(id);
             if (o.isEmpty()) {
-                return null;
+                throw new Exception();
             }
             Ordine ordine = o.get();
             ordine.setStato(s);
             ordineRepository.save(ordine);
             return ordine.getStato().toString();
-        } catch (Exception e) {
-            return e.getMessage();
-        }
+        } else throw new Exception();
     }
 
-    public Ordine getOrdine(String id) {
-        try {
-            return ordineRepository.findById(id).orElseThrow();
-        } catch (Exception e) {
-            return null;
-        }
+    public Ordine getOrdine(String id) throws Exception{
+        if (ObjectId.isValid(id)) return ordineRepository.findById(id).orElseThrow();
+        else throw new Exception();
     }
 
-    public List<Ordine> getAll() {
-        try {
-            return ordineRepository.findAll();
-        } catch (Exception e) {
-            return null;
-        }
+    public List<Ordine> getAll() throws Exception {
+        return ordineRepository.findAll();
     }
 
-    public List<Ordine> getWaiting() {
+    public List<Ordine> getWaiting() throws Exception{
         List<Ordine> l = ordineRepository.findAll();
         List<Ordine> ordini = new ArrayList<Ordine>();
         for (Ordine o: l) {

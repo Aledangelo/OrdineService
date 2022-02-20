@@ -1,72 +1,74 @@
 package com.greenteam.ordineservice.service;
 
 import com.greenteam.ordineservice.entity.Ordine;
-import com.greenteam.ordineservice.entity.Rider;
 import com.greenteam.ordineservice.entity.statoOrdine;
-import com.greenteam.ordineservice.entity.statoRider;
-import com.greenteam.ordineservice.repository.riderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class gestioneRider {
-    @Autowired
-    private riderRepository riderRepository;
 
     @Autowired
     private gestioneOrdini gestioneOrdini;
 
-    public String accettaOrdine(String id_rider, String id_ordine) {
-        try {
-            Ordine o = gestioneOrdini.getOrdine(id_ordine);
-            if (o == null) {
-                return "Operation not permitted";
-            }
-            o.setNome_rider(id_rider);
-            gestioneOrdini.setRiderOrdine(id_rider, id_ordine);
-            String s = gestioneOrdini.updateStato(id_ordine, statoOrdine.ACCETTATO);
-            return s;
-        } catch (Exception e) {
-            return e.getMessage();
+    public void accettaOrdine(String id_rider, String id_ordine) throws Exception {
+        Ordine o = gestioneOrdini.getOrdine(id_ordine);
+        if (o == null) {
+            return;
+        }
+        if (o.getStato() != statoOrdine.IN_ATTESA) {
+            return;
+        }
+        o.setNome_rider(id_rider);
+        gestioneOrdini.setRiderOrdine(id_rider, id_ordine);
+        gestioneOrdini.updateStato(id_ordine, statoOrdine.ACCETTATO);
+    }
+
+    public void chiudiOrdine(String id_ordine, String id_rider) throws Exception {
+        Ordine o = gestioneOrdini.getOrdine(id_ordine);
+        if (o.getNome_rider().equals(id_rider)) {
+            gestioneOrdini.updateStato(id_ordine, statoOrdine.CONSEGNATO);
         }
     }
 
-    public String chiudiOrdine(String id) {
-        try {
-            Optional<Rider> r = riderRepository.findById(id);
-            Rider rider = r.get();
-            if (r.isEmpty()) {
-                return "Operation not permitted";
-            }
-            String id_ordine = rider.getId_ordine();
-            rider.setId_ordine(null);
-            rider.setStato(statoRider.DISPONIBILE);
-            riderRepository.save(rider);
-            return gestioneOrdini.updateStato(id_ordine, statoOrdine.CONSEGNATO);
-        } catch (Exception e) {
-            return e.getMessage();
+    public void sospendiOrdine(String id) throws Exception{
+        Ordine o = gestioneOrdini.getOrdine(id);
+        if (o.getStato() != statoOrdine.IN_ATTESA) {
+            return;
         }
+        gestioneOrdini.updateStato(id, statoOrdine.IN_SOSPESO);
     }
 
-    public String sospendiOrdine(String id) {
-        try {
-            return gestioneOrdini.updateStato(id, statoOrdine.IN_SOSPESO);
-        } catch (Exception e) {
-            return e.getMessage();
+    public void riattivaOrdine(String id) throws Exception{
+        Ordine o = gestioneOrdini.getOrdine(id);
+        if (o.getStato() != statoOrdine.IN_SOSPESO) {
+            return;
         }
+        gestioneOrdini.updateStato(id, statoOrdine.IN_ATTESA);
     }
 
-    public Ordine myOrder(String id_rider) {
+    public List<Ordine> myOrderRider(String id_rider) throws Exception{
         List<Ordine> l = gestioneOrdini.getAll();
+        List<Ordine> myList = new ArrayList<Ordine>();
         for (Ordine o: l) {
             if (o.getNome_rider() != null && o.getNome_rider().equals(id_rider)) {
-                return o;
+                myList.add(o);
             }
         }
-        return null;
+        return myList;
+    }
+
+    public List<Ordine> myOrderUser(String id_user) throws Exception{
+        List<Ordine> l = gestioneOrdini.getAll();
+        List<Ordine> myList = new ArrayList<Ordine>();
+        for (Ordine o: l) {
+            if (o.getId_user() != null && o.getId_user().equals(id_user)) {
+                myList.add(o);
+            }
+        }
+        return myList;
     }
 }

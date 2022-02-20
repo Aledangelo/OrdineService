@@ -46,9 +46,7 @@ div.centre {
 				<td th:text="${ordine.getPrezzo_totale()}">Prezzo</td>
 				<td th:text="${ordine.getStato()}">Stato</td>
 				<td th:each="prodotto: ${ordine.getProdotti()}" th:text="${prodotto.getNome()}">Nome</td>
-				<td><form th:if="${ordine.getStato() != CONSEGNATO}" th:action="@{/ordini/complete/{id_ordine}(id_ordine = ${ordine.getId()})}" method="get">
-					<button type ="submit" style="background-color:white">Completa Ordine</button>
-				</form>
+				<td>
 				</td>
 			</tr>
 			</tbody>

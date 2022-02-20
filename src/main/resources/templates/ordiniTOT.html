@@ -6,41 +6,47 @@
 	<link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css" />
 </head>
 <body>
-	
-	<div class = "container text-center">
-		<div>
-        <h1>Lista Ordini</h1>
+
+    <div class = "container text-center">
+        <h1 th:if="${not listaOrdini.isEmpty()}">Ordini</h1>
+        <h1 th:if="${listaOrdini.isEmpty()}">Al momento non vi sono ordini in attesa</h1>
     </div>
      
     <div>
-        <table class="table table-striped table-bordered" id = "mytab1">
+        <table class="table table-striped table-bordered" id = "mytab1" th:if="${not listaOrdini.isEmpty()}">
             <thead class="thead-dark">
                 <tr>
                     <th>Ristorante</th>
                     <th>Prezzo</th>
                     <th>Stato</th>
+                    <th>Indirizzo</th>
                     <th>Prodotti</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:each="ordine: ${listaOrdini}">
-                    <td th:text="${ordine.getId()}" hidden></td>
                     <td th:text="${ordine.getNome_ristorante()}">Ristorante</td>
                     <td th:text="${ordine.getPrezzo_totale()}">Prezzo</td>
                     <td th:text="${ordine.getStato()}">Stato</td>
+                    <td th:text="${ordine.getIndirizzo()}">Indirizzo</td>
                     <td th:each="prodotto: ${ordine.getProdotti()}" th:text="${prodotto.getNome()}">Nome</td>
                     <td><form th:action="@{/ordini/drop/{id_ordine}(id_ordine = ${ordine.getId()})}" method="get">
                     <button type ="submit" style="background-color:white">Rimuvi Ordine</button>
 					</form>
                     </td>
-                    <td><form th:action="@{/ordini/suspend/{id_ordine}(id_ordine = ${ordine.getId()})}" method="get">
+                    <td><form th:action="@{/ordini/suspend/{id_ordine}(id_ordine = ${ordine.getId()})}" method="get" th:if="${ordine.getStato() == ATTESA}">
                         <button type ="submit" style="background-color:white">Sospendi Ordine</button>
+                    </form>
+                    </td>
+                    <td><form th:action="@{/ordini/activate/{id_ordine}(id_ordine = ${ordine.getId()})}" method="get" th:if="${ordine.getStato() == SOSPESO}">
+                        <button type ="submit" style="background-color:white">Riattiva Ordine</button>
                     </form>
                     </td>
                 </tr>
             </tbody>
         </table>
+        <h4><a th:href="@{/prodotto/Dashboard}">Clicca qui per tornare alla dashboard</a></h4>
     </div>
 </div>
 

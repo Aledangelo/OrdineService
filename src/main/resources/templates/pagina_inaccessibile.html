@@ -2,24 +2,24 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="ISO-8859-1">
-	<title>Ordine</title>
-<style>
-.success {
+	<title>aaaaaaa</title>
+	<style>
+		.error{
+			color: #D8000C;
+			background-color: #FFBABA;
+			background-image: url('https://i.imgur.com/GnyDvKN.png');
 			border: 1px solid;
 			margin: 10px 0px;
 			padding: 15px 10px 15px 50px;
 			background-repeat: no-repeat;
 			background-position: 10px center;
-			color: #4F8A10;
-			background-color: #DFF2BF;
-			background-image: url('https://i.imgur.com/Q9BGTuy.png')
-}
+		}
 </style>
 </head>
 <body>
 	<div class = "container text-center">
 		<div>
-			<h3 class="success">Ordine creato correttamente</h3>
+			<h3 class="error">Errore: pagina inaccessibile.<br>La sessione &egrave scaduta oppure non si possiede l'autorizzazione necessaria per accedere a questa pagina.</h3>
 			<h4><a th:href="@{/prodotto/Dashboard}">Clicca qui per tornare alla dashboard</a></h4>
 		</div>
 
