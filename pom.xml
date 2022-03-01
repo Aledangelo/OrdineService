@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.greenTeam</groupId>
 	<artifactId>OrdineService</artifactId>
-	<version>0.0.1</version>
+	<version>0.1.5</version>
 	<name>OrdineService</name>
 	<description>OrdineService</description>
 	<properties>
@@ -50,6 +50,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-vault-config</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-bootstrap</artifactId>
@@ -110,14 +111,11 @@
 					</excludes>
 				</configuration>
 			</plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>15</source>
-                    <target>15</target>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${project.parent.version}</version>
+			</plugin>
 
 			<plugin>
 				<groupId>com.spotify</groupId>
